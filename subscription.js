@@ -12,7 +12,7 @@ import { auth, db } from "./firebase-init.js";
 
 // TODO: replace with your real Netlify site URL once it's deployed
 // (found in your Netlify dashboard, looks like https://your-site-name.netlify.app)
-const NETLIFY_FUNCTIONS_BASE = "https://YOUR-NETLIFY-SITE.netlify.app/.netlify/functions";
+const NETLIFY_FUNCTIONS_BASE = "https://stirring-lamington-a35869.netlify.app/.netlify/functions";
 
 window.isUserSubscribed = false;
 
