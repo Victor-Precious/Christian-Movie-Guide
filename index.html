@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christian Movie Guide — Stories worth watching</title>
+<meta name="description" content="A curated home for Christian movies, organized by spiritual topic.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+  <div class="container nav-row">
+    <a href="index.html" class="wordmark">CMG</a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="movies.html">Movies</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <div class="auth-area">
+        <button class="btn btn-ghost" id="signin-btn" data-action="signin">Sign In</button>
+        <div class="auth-signed-in" hidden>
+          <span class="auth-email"></span>
+          <span class="subscriber-badge" hidden>Subscriber</span>
+          <button class="btn btn-ghost btn-sm" id="cancel-subscription-btn" hidden>Cancel Subscription</button>
+          <button class="btn btn-ghost btn-sm" id="signout-btn">Sign Out</button>
+        </div>
+      </div>
+      <button class="btn btn-solid" data-action="subscribe">Subscribe</button>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container">
+    <p class="hero-eyebrow">Curated, not algorithmic</p>
+    <h1>Stories worth watching, <em>and worth your time</em>.</h1>
+    <p>Christian Movie Guide gathers the best faith-based movies from YouTube into one place, organized by spiritual topic — so you spend less time searching and more time being edified.</p>
+    <div class="hero-actions">
+      <a href="movies.html" class="btn btn-solid btn-lg">Browse Movies</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MOVIES PREVIEW ===== -->
+<section class="container">
+
+  <div class="shelf-section">
+    <div class="shelf-head">
+      <div>
+        <p class="shelf-eyebrow">Movies · Now showing</p>
+        <h2 class="shelf-title">New Releases</h2>
+      </div>
+      <div class="shelf-controls">
+        <button class="shelf-arrow prev" aria-label="Scroll left">&#8249;</button>
+        <button class="shelf-arrow next" aria-label="Scroll right">&#8250;</button>
+      </div>
+    </div>
+    <div class="shelf-track" data-topic="New Releases">
+      <!-- filled by script.js from the MOVIES array -->
+    </div>
+  </div>
+
+  <div class="shelf-section">
+    <div class="shelf-head">
+      <div>
+        <p class="shelf-eyebrow">Movies · Now showing</p>
+        <h2 class="shelf-title">Newly found</h2>
+      </div>
+      <div class="shelf-controls">
+        <button class="shelf-arrow prev" aria-label="Scroll left">&#8249;</button>
+        <button class="shelf-arrow next" aria-label="Scroll right">&#8250;</button>
+      </div>
+    </div>
+    <div class="shelf-track" data-topic="Newly found">
+      <!-- filled by script.js from the MOVIES array -->
+    </div>
+  </div>
+
+  <!-- ===== SUBSCRIBE CTA ===== -->
+  <div class="cta-banner">
+    <div>
+      <h2>Unlock the full library.</h2>
+      <p>One subscription gives you every movie across every topic — new additions every week.</p>
+    </div>
+    <button class="btn btn-solid btn-lg" data-action="subscribe">Subscribe Now</button>
+  </div>
+
+  <div class="suggest-section">
+    <h2>Don't see what you're looking for?</h2>
+    <p>Suggest a movie, or a whole new topic you'd like us to start curating for.</p>
+    <div class="suggest-links">
+      <a href="#" data-contact="whatsapp" target="_blank" rel="noopener noreferrer" class="btn btn-solid btn-lg suggest-whatsapp">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.8 14.02c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.13.11-1.82-.11-.42-.13-.96-.31-1.65-.61-2.91-1.26-4.81-4.18-4.96-4.37-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.01-2.41.27-.29.58-.36.78-.36.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.83 2 .9 2.14.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.56.15.27.68 1.12 1.46 1.82 1.01.9 1.86 1.18 2.13 1.31.27.14.43.11.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.22.6-.13.24.09 1.52.72 1.78.85.27.13.44.2.51.31.07.11.07.62-.17 1.3z"/></svg>
+        WhatsApp Us
+      </a>
+      <a href="#" data-contact="email" class="btn btn-ghost btn-lg suggest-email">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        Email Us
+      </a>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="container footer-row">
+    <p class="footer-note">Christian Movie Guide curates content hosted on YouTube. Tapping a title opens the video directly in YouTube or the YouTube app.</p>
+    <ul class="footer-links">
+      <li><a href="movies.html">Movies</a></li>
+      <li><a href="#" data-action="subscribe">Subscribe</a></li>
+    </ul>
+  </div>
+  <div class="container">
+    <p class="footer-copy">&copy; 2026 Christian Movie Guide. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- ===== SUBSCRIBE MODAL ===== -->
+<div class="modal-backdrop" id="subscribe-modal">
+  <div class="modal-box">
+    <svg class="modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4"/></svg>
+    <h3>This title is for subscribers</h3>
+    <p>Subscribe to unlock the full Movies library, across every topic.</p>
+    <div class="modal-actions">
+      <button class="btn btn-solid btn-lg" id="modal-subscribe-btn">Subscribe Now</button>
+      <button class="modal-close" data-close-modal>Maybe later</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SIGN IN / CREATE ACCOUNT MODAL ===== -->
+<div class="modal-backdrop" id="signin-modal">
+  <div class="modal-box">
+    <h3 id="signin-title">Sign In</h3>
+    <p id="signin-subtitle">Welcome back to Christian Movie Guide.</p>
+
+    <form id="auth-form" class="auth-form">
+      <input type="email" id="auth-email-input" class="auth-input" placeholder="Email" required autocomplete="email">
+      <input type="password" id="auth-password-input" class="auth-input" placeholder="Password" required autocomplete="current-password" minlength="6">
+      <p class="auth-error" id="auth-error" hidden></p>
+      <button type="submit" class="btn btn-solid btn-lg" id="auth-submit-btn">Sign In</button>
+    </form>
+
+    <div class="auth-divider"><span>or</span></div>
+
+    <button type="button" class="btn btn-ghost btn-lg auth-google-btn" id="google-signin-btn">Continue with Google</button>
+
+    <p class="auth-toggle-text">
+      <span id="auth-toggle-prompt">Don't have an account?</span>
+      <button type="button" class="auth-toggle-link" id="auth-toggle-mode">Create one</button>
+    </p>
+
+    <button class="modal-close" data-close-modal>Cancel</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script type="module" src="auth.js"></script>
+<script type="module" src="subscription.js"></script>
+</body>
+</html>
