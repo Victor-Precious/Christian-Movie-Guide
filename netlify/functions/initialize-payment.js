@@ -98,7 +98,11 @@ exports.handler = async (event) => {
     },
     body: JSON.stringify({
       email,
-      plan: PAYSTACK_PLAN_CODE, // Paystack pulls the price + billing interval from the plan
+      // Paystack requires "amount" to be present even when a plan is
+      // supplied — it just ignores this value and charges the plan's
+      // real price instead. See: https://paystack.com/docs/payments/subscriptions/
+      amount: 100,
+      plan: PAYSTACK_PLAN_CODE,
       callback_url: callbackUrl,
       metadata: { uid }, // this is how the webhook knows WHICH user paid
     }),
