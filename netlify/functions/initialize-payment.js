@@ -102,6 +102,8 @@ exports.handler = async (event) => {
       // supplied — it just ignores this value and charges the plan's
       // real price instead. See: https://paystack.com/docs/payments/subscriptions/
       amount: 100,
+      currency: "NGN", // must match your plan's currency — change if your plan uses a different one
+      channels: ["card"], // explicitly request card, rather than relying on account defaults
       plan: PAYSTACK_PLAN_CODE,
       callback_url: callbackUrl,
       metadata: { uid }, // this is how the webhook knows WHICH user paid
