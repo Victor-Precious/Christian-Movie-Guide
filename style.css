@@ -770,7 +770,7 @@ button {
     flex-direction: column;
     gap: 16px;
     position: absolute;
-    top: 76px;
+    top: 100%;
     left: 0;
     right: 0;
     background: var(--surface);
@@ -783,4 +783,26 @@ button {
   .cta-banner { padding: 40px 24px; }
   .card { flex: 0 0 180px; }
   .auth-email { max-width: 100px; }
+
+  /* Tighten up the header row so Subscribe has room to breathe */
+  .nav-row {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 76px;
+    padding: 12px 0;
+    gap: 10px 0;
+  }
+  .wordmark { font-size: 17px; }
+  .nav-actions { gap: 8px; }
+  .nav-actions .btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .auth-area .auth-signed-in { gap: 6px; }
+  .subscriber-badge { display: none; } /* Cancel button showing is enough signal on mobile */
+}
+
+@media (max-width: 480px) {
+  .auth-email { display: none; } /* keep the row from crowding on very narrow phones */
+  .nav-actions .btn { padding: 7px 12px; font-size: 12.5px; }
 }
