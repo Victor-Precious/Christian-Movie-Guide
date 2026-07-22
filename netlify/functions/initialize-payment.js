@@ -19,7 +19,7 @@ if (!admin.apps.length) {
 // smallest currency unit — use the real amount (e.g. 5000 for ₦5,000,
 // not 500000).
 // ---------------------------------------------------------
-const SUBSCRIPTION_AMOUNT = 5000; // e.g. ₦5,000 — CHANGE to match your plan's price
+const SUBSCRIPTION_AMOUNT = 500; // e.g. ₦5,000 — CHANGE to match your plan's price
 const SUBSCRIPTION_CURRENCY = "NGN"; // must match your plan's currency exactly
 
 // Set this to the numeric Payment Plan ID from your Flutterwave dashboard
