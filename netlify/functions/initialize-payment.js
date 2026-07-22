@@ -1,5 +1,5 @@
 // =========================================================
-// CHRISTIAN MOVIE GUIDE — Netlify Function: start Paystack checkout
+// CHRISTIAN MOVIE GUIDE — Netlify Function: start Flutterwave checkout
 // Called from subscription.js when someone clicks Subscribe.
 // Verifies the person is really signed in (via their Firebase ID
 // token) before starting a payment in their name.
@@ -13,15 +13,20 @@ if (!admin.apps.length) {
 }
 
 // ---------------------------------------------------------
-// This charges using a Paystack PLAN, not a fixed amount — the plan
-// itself defines the price and how often it recurs (e.g. monthly).
-// Create the plan in your Paystack dashboard: Payments -> Plans -> New Plan
-// (set Interval to "Monthly"), then copy its plan code below.
+// TODO: these MUST match the Payment Plan you created in your
+// Flutterwave dashboard (Settings -> Payment Plans).
+// IMPORTANT: unlike Paystack, Flutterwave amounts are NOT in the
+// smallest currency unit — use the real amount (e.g. 5000 for ₦5,000,
+// not 500000).
 // ---------------------------------------------------------
-const PAYSTACK_PLAN_CODE = process.env.PAYSTACK_PLAN_CODE; // e.g. "PLN_xxxxxxxxxxxx"
+const SUBSCRIPTION_AMOUNT = 5000; // e.g. ₦5,000 — CHANGE to match your plan's price
+const SUBSCRIPTION_CURRENCY = "NGN"; // must match your plan's currency exactly
+
+// Set this to the numeric Payment Plan ID from your Flutterwave dashboard
+// (Settings -> Payment Plans -> your plan). It looks like a plain number, e.g. "123456".
+const FLW_PLAN_ID = process.env.FLW_PLAN_ID;
 
 // TODO once your site is live, replace "*" with your real domain
-// (e.g. "https://christianmovieguide.com") to lock this down.
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -74,49 +79,49 @@ exports.handler = async (event) => {
     };
   }
 
+  if (!FLW_PLAN_ID) {
+    return {
+      statusCode: 500,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ error: "Subscription plan isn't configured yet — set FLW_PLAN_ID." }),
+    };
+  }
+
   let payload = {};
   try {
     payload = JSON.parse(event.body || "{}");
   } catch (err) {
-    // ignore — just use defaults below
+    // ignore — just use the default below
   }
   const callbackUrl = payload.callbackUrl || "https://example.com/movies.html";
 
-  if (!PAYSTACK_PLAN_CODE) {
-    return {
-      statusCode: 500,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ error: "Subscription plan isn't configured yet — set PAYSTACK_PLAN_CODE." }),
-    };
-  }
+  // Must be unique on every attempt — Flutterwave rejects a reused reference.
+  const txRef = `cmg-${uid}-${Date.now()}`;
 
-  const paystackRes = await fetch("https://api.paystack.co/transaction/initialize", {
+  const flwRes = await fetch("https://api.flutterwave.com/v3/payments", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email,
-      // Paystack requires "amount" to be present even when a plan is
-      // supplied — it just ignores this value and charges the plan's
-      // real price instead. See: https://paystack.com/docs/payments/subscriptions/
-      amount: 100,
-      currency: "NGN", // must match your plan's currency — change if your plan uses a different one
-      channels: ["card"], // explicitly request card, rather than relying on account defaults
-      plan: PAYSTACK_PLAN_CODE,
-      callback_url: callbackUrl,
-      metadata: { uid }, // this is how the webhook knows WHICH user paid
+      tx_ref: txRef,
+      amount: SUBSCRIPTION_AMOUNT,
+      currency: SUBSCRIPTION_CURRENCY,
+      redirect_url: callbackUrl,
+      payment_plan: FLW_PLAN_ID, // this is what makes it recurring, not a one-off charge
+      customer: { email },
+      meta: { uid }, // this is how the webhook knows WHICH user paid
     }),
   });
 
-  const data = await paystackRes.json();
+  const data = await flwRes.json();
 
-  if (!data.status) {
+  if (data.status !== "success" || !data.data || !data.data.link) {
     return {
       statusCode: 500,
       headers: CORS_HEADERS,
-      body: JSON.stringify({ error: data.message || "Paystack could not start checkout." }),
+      body: JSON.stringify({ error: (data && data.message) || "Flutterwave could not start checkout." }),
     };
   }
 
@@ -124,8 +129,8 @@ exports.handler = async (event) => {
     statusCode: 200,
     headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
     body: JSON.stringify({
-      authorizationUrl: data.data.authorization_url,
-      reference: data.data.reference,
+      authorizationUrl: data.data.link, // same field name subscription.js already expects
+      reference: txRef,
     }),
   };
 };

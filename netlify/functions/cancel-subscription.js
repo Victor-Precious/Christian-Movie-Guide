@@ -1,7 +1,7 @@
 // =========================================================
 // CHRISTIAN MOVIE GUIDE — Netlify Function: cancel subscription
 // Called from subscription.js when someone clicks "Cancel Subscription".
-// Verifies the person is signed in, then tells Paystack to stop
+// Verifies the person is signed in, then tells Flutterwave to stop
 // billing them and updates Firestore.
 // =========================================================
 const admin = require("firebase-admin");
@@ -58,7 +58,7 @@ exports.handler = async (event) => {
   const customerSnap = await db.collection("customers").doc(uid).get();
   const customerData = customerSnap.exists ? customerSnap.data() : null;
 
-  if (!customerData || !customerData.subscriptionCode || !customerData.emailToken) {
+  if (!customerData || !customerData.subscriptionId) {
     return {
       statusCode: 400,
       headers: CORS_HEADERS,
@@ -66,21 +66,19 @@ exports.handler = async (event) => {
     };
   }
 
-  const paystackRes = await fetch("https://api.paystack.co/subscription/disable", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      code: customerData.subscriptionCode,
-      token: customerData.emailToken,
-    }),
-  });
+  const flwRes = await fetch(
+    `https://api.flutterwave.com/v3/subscriptions/${customerData.subscriptionId}/cancel`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+      },
+    }
+  );
 
-  const data = await paystackRes.json();
+  const data = await flwRes.json();
 
-  if (!data.status) {
+  if (data.status !== "success") {
     return {
       statusCode: 500,
       headers: CORS_HEADERS,
@@ -89,9 +87,8 @@ exports.handler = async (event) => {
   }
 
   // Stop future billing right away, but DON'T cut off access yet — they
-  // already paid for the current period, so let it run out naturally.
-  // "nextPaymentDate" (captured from Paystack's subscription webhooks) is
-  // what the site uses to know when that period actually ends.
+  // already paid for the current period, so let it run out naturally
+  // (same "access until period end" behavior as before).
   await db.collection("customers").doc(uid).set({ cancelPending: true }, { merge: true });
 
   return {
