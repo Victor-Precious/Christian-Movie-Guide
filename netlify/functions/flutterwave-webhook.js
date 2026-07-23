@@ -38,9 +38,10 @@ exports.handler = async (event) => {
 
   // Fires on the very first charge, and on every monthly renewal charge.
   if (webhookEvent.event === "charge.completed" && data.status === "successful") {
-    const email = data.customer && data.customer.email;
-    const uidFromMeta = data.meta && data.meta.uid;
-    const uid = uidFromMeta || (email ? await findUidByEmail(email) : null);
+    const email = normalizeTestEmail(data.customer && data.customer.email);
+    const uidFromMeta = extractUidFromMeta(data.meta);
+    const uidFromTxRef = extractUidFromTxRef(data.tx_ref);
+    const uid = uidFromMeta || uidFromTxRef || (email ? await findUidByEmail(email) : null);
 
     if (uid) {
       await db.collection("customers").doc(uid).set(
@@ -68,7 +69,7 @@ exports.handler = async (event) => {
   // Fires when a subscription is cancelled (via our cancel-subscription.js,
   // or directly from the Flutterwave dashboard).
   if (webhookEvent.event === "subscription.cancelled") {
-    const email = data.customer && data.customer.email;
+    const email = normalizeTestEmail(data.customer && data.customer.email);
     const uid = email ? await findUidByEmail(email) : null;
     if (uid) {
       await db.collection("customers").doc(uid).set({ cancelPending: true }, { merge: true });
@@ -84,6 +85,30 @@ async function findUidByEmail(email) {
   const snap = await db.collection("customers").where("email", "==", email).limit(1).get();
   if (snap.empty) return null;
   return snap.docs[0].id;
+}
+
+/* ---------- Pull uid straight out of our own tx_ref, e.g. "cmg-<uid>-1721234567890" ----------
+   This is the most reliable way to identify who paid on the FIRST charge — it doesn't
+   depend on Flutterwave's meta field shape or on emails matching exactly. */
+function extractUidFromTxRef(txRef) {
+  if (!txRef) return null;
+  const match = /^cmg-([^-]+)-\d+$/.exec(txRef);
+  return match ? match[1] : null;
+}
+
+/* ---------- Handle Flutterwave sometimes sending meta as an object, sometimes as an array ---------- */
+function extractUidFromMeta(meta) {
+  if (!meta) return null;
+  if (!Array.isArray(meta)) return meta.uid || null;
+  const entry = meta.find((m) => m && (m.key === "uid" || m.metaname === "uid"));
+  return entry ? entry.value || entry.metavalue : null;
+}
+
+/* ---------- Flutterwave TEST MODE rewrites emails like "ravesb_<hash>_realname@domain.com" —
+   strip that prefix so lookups match the real, stored email. Live mode emails pass through unchanged. */
+function normalizeTestEmail(email) {
+  if (!email) return email;
+  return email.replace(/^ravesb_[a-f0-9]+_/i, "");
 }
 
 /* ---------- Fetch the real subscription record so it can be cancelled later ---------- */
