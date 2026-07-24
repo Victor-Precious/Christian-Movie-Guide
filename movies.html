@@ -20,21 +20,6 @@
         <li><a href="movies.html" class="active">Movies</a></li>
       </ul>
     </nav>
-    <div class="nav-actions">
-      <div class="auth-area">
-        <button class="btn btn-ghost" id="signin-btn" data-action="signin">Sign In</button>
-        <div class="auth-signed-in" hidden>
-          <span class="auth-email"></span>
-          <span class="subscriber-badge" hidden>Subscriber</span>
-          <button class="btn btn-ghost btn-sm" id="cancel-subscription-btn" hidden>Cancel Subscription</button>
-          <button class="btn btn-ghost btn-sm" id="signout-btn">Sign Out</button>
-        </div>
-      </div>
-      <button class="btn btn-solid" data-action="subscribe">Subscribe</button>
-      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
   </div>
 </header>
 
@@ -42,7 +27,7 @@
 <section class="page-hero">
   <div class="container">
     <h1>Movies</h1>
-    <p>Faith-based films from YouTube, organized by topic. Tap any title to watch on YouTube — locked titles unlock with a N500 monthly subscription.</p>
+    <p>Faith-based films from YouTube, organized by topic — updates biweekly. Tap any title to watch on YouTube.</p>
   </div>
 </section>
 
@@ -432,14 +417,7 @@
     </div>
   </div>
 
-  <div class="cta-banner">
-    <div>
-      <h2>Unlock the full library.</h2>
-      <p>Monthly subscriptions give you every movie across every topic — new additions every week.</p>
-    </div>
-    <button class="btn btn-solid btn-lg" data-action="subscribe">Subscribe Now</button>
-  </div>
-
+  
   <div class="suggest-section">
     <h2>Recommendations?</h2>
     <p>Suggest a movie, a whole new topic you'd like us to start curating for, or anything you want to recommend for this site. Let's build a safe Media together.</p>
@@ -462,7 +440,6 @@
     <p class="footer-note">Christian Movie Guide curates content hosted on YouTube. Tapping a title opens the video directly in YouTube or the YouTube app.</p>
     <ul class="footer-links">
       <li><a href="movies.html">Movies</a></li>
-      <li><a href="#" data-action="subscribe">Subscribe</a></li>
     </ul>
   </div>
   <div class="container">
@@ -470,45 +447,7 @@
   </div>
 </footer>
 
-<div class="modal-backdrop" id="subscribe-modal">
-  <div class="modal-box">
-    <svg class="modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4"/></svg>
-    <h3>This title is for subscribers</h3>
-    <p>Subscribe to unlock the full Movies library, across every topic.</p>
-    <div class="modal-actions">
-      <button class="btn btn-solid btn-lg" id="modal-subscribe-btn">Subscribe Now</button>
-      <button class="modal-close" data-close-modal>Maybe later</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="signin-modal">
-  <div class="modal-box">
-    <h3 id="signin-title">Sign In</h3>
-    <p id="signin-subtitle">Welcome back to Christian Movie Guide.</p>
-
-    <form id="auth-form" class="auth-form">
-      <input type="email" id="auth-email-input" class="auth-input" placeholder="Email" required autocomplete="email">
-      <input type="password" id="auth-password-input" class="auth-input" placeholder="Password" required autocomplete="current-password" minlength="6">
-      <p class="auth-error" id="auth-error" hidden></p>
-      <button type="submit" class="btn btn-solid btn-lg" id="auth-submit-btn">Sign In</button>
-    </form>
-
-    <div class="auth-divider"><span>or</span></div>
-
-    <button type="button" class="btn btn-ghost btn-lg auth-google-btn" id="google-signin-btn">Continue with Google</button>
-
-    <p class="auth-toggle-text">
-      <span id="auth-toggle-prompt">Don't have an account?</span>
-      <button type="button" class="auth-toggle-link" id="auth-toggle-mode">Create one</button>
-    </p>
-
-    <button class="modal-close" data-close-modal>Cancel</button>
-  </div>
-</div>
 
 <script src="script.js"></script>
-<script type="module" src="auth.js"></script>
-<script type="module" src="subscription.js"></script>
 </body>
 </html>
