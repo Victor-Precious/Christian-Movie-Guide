@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movie Catalog Converter — Christian Movie Guide</title>
+<style>
+  :root {
+    --bg: #141414;
+    --surface: #1F1F1F;
+    --line: #333333;
+    --ink: #FFFFFF;
+    --ink-soft: #B3B3B3;
+    --accent: #E50914;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", Segoe UI, sans-serif;
+    padding: 32px 20px 80px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  .sub { color: var(--ink-soft); margin: 0 0 32px; font-size: 15px; line-height: 1.5; }
+
+  .lib-status {
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .lib-status.loading {
+    display: block;
+    background: rgba(255, 209, 102, 0.1);
+    color: #ffd166;
+    border: 1px solid rgba(255, 209, 102, 0.3);
+  }
+  .lib-status.error {
+    display: block;
+    background: rgba(229, 9, 20, 0.1);
+    color: #ff8a8a;
+    border: 1px solid rgba(229, 9, 20, 0.4);
+  }
+
+  .dropzone {
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  }
+  .dropzone:hover, .dropzone.drag-over {
+    border-color: var(--accent);
+    background: rgba(229, 9, 20, 0.06);
+  }
+  .dropzone.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .dropzone p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+  .dropzone strong { color: var(--ink); }
+  input[type="file"] { display: none; }
+
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { opacity: 0.9; }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--ink-soft); }
+
+  .status { margin-top: 18px; font-size: 14px; }
+  .status.error { color: #ff6b6b; }
+  .status.ok { color: #4ade80; }
+
+  .warnings {
+    margin-top: 16px;
+    background: var(--surface);
+    border: 1px solid #6b5000;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #ffd166;
+    display: none;
+  }
+  .warnings.show { display: block; }
+  .warnings ul { margin: 8px 0 0; padding-left: 18px; }
+
+  .output-section { margin-top: 28px; display: none; }
+  .output-section.show { display: block; }
+  .output-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .output-head h2 { font-size: 16px; margin: 0; }
+  textarea {
+    width: 100%;
+    height: 360px;
+    background: var(--surface);
+    color: #d4d4d4;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    resize: vertical;
+  }
+  .count-pill {
+    display: inline-block;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 10px;
+  }
+  .topics-note {
+    margin-top: 24px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .topics-note code {
+    background: var(--surface);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Movie Catalog Converter</h1>
+  <p class="sub">Upload your filled-in movie spreadsheet and this generates the JavaScript array ready to paste into <code>script.js</code>. Nothing is uploaded anywhere — this all runs in your browser. Every movie is free to watch — no locking/subscriber columns needed.</p>
+
+  <div class="lib-status loading" id="libStatus">Loading spreadsheet library…</div>
+
+  <div class="dropzone disabled" id="dropzone">
+    <p><strong>Click to choose a file</strong> or drag your .xlsx here</p>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+  </div>
+
+  <div id="status" class="status"></div>
+  <div id="warnings" class="warnings"></div>
+
+  <div class="output-section" id="outputSection">
+    <div class="output-head">
+      <h2>Paste this into the MOVIES array in script.js</h2>
+      <button class="btn btn-accent" id="copyBtn">Copy</button>
+    </div>
+    <textarea id="output" readonly spellcheck="false"></textarea>
+    <div class="count-pill" id="countPill"></div>
+  </div>
+
+  <div class="topics-note">
+    <strong>A movie can be in more than one topic</strong> — just separate them with commas in the Topic column, e.g. <code>Family, Hope</code>. It'll appear on both shelves.<br><br>
+    <strong>Each topic must exactly match one of these</strong> (case-sensitive):<br>
+    <code>New Releases</code> · <code>Newly found</code> · <code>Salvation</code> · <code>Redemption</code> · <code>Forgiveness/Reconciliation</code> · <code>Repentance/Restoration</code> · <code>Spiritual Enlightenment</code> · <code>Hope</code> · <code>Faith</code> · <code>Consecration</code> · <code>Addictions</code> · <code>Brotherly Love and Sacrifice</code> · <code>Purpose Fulfilment</code> · <code>Deliverance/Spiritual Warfare</code> · <code>Evangelism</code> · <code>Children</code> · <code>Young Adults</code> · <code>Couples</code> · <code>Parents</code> · <code>Ministers</code> · <code>Love Relationship</code> · <code>Family</code> · <code>Old classics</code><br><br>
+    Adding a brand-new topic? You'll also need to add a matching shelf (with the same <code>data-topic</code> value) to your HTML — this tool will still convert it, but it won't show up on the site until that shelf exists.
+  </div>
+</div>
+
+<script>
+  // =========================================================
+  // Load the spreadsheet library (SheetJS) with a fallback.
+  // If the first CDN fails (network block, outage, etc.),
+  // automatically try a second one before giving up.
+  // =========================================================
+  const SHEETJS_SOURCES = [
+    "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+    "https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js",
+  ];
+
+  let libraryReady = false;
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Failed to load ' + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function loadLibraryWithFallback() {
+    const libStatus = document.getElementById('libStatus');
+    const dropzone = document.getElementById('dropzone');
+
+    for (let i = 0; i < SHEETJS_SOURCES.length; i++) {
+      try {
+        await loadScript(SHEETJS_SOURCES[i]);
+        if (typeof XLSX !== 'undefined') {
+          libraryReady = true;
+          libStatus.className = 'lib-status';
+          libStatus.textContent = '';
+          dropzone.classList.remove('disabled');
+          return;
+        }
+      } catch (err) {
+        console.warn('Source failed:', SHEETJS_SOURCES[i], err);
+        // try the next source
+      }
+    }
+
+    // All sources failed
+    libStatus.className = 'lib-status error';
+    libStatus.textContent = 'Could not load the spreadsheet library from any source. Check your internet connection, try disabling any ad-blocker/VPN, or try a different network or browser, then reload this page.';
+  }
+
+  loadLibraryWithFallback();
+
+  // =========================================================
+  // The rest of the converter (unchanged logic)
+  // =========================================================
+  const KNOWN_TOPICS = [
+    "New Releases",
+    "Newly found",
+    "Salvation",
+    "Redemption",
+    "Forgiveness/Reconciliation",
+    "Repentance/Restoration",
+    "Spiritual Enlightenment",
+    "Hope",
+    "Faith",
+    "Consecration",
+    "Addictions",
+    "Brotherly Love and Sacrifice",
+    "Purpose Fulfilment",
+    "Deliverance/Spiritual Warfare",
+    "Evangelism",
+    "Children",
+    "Young Adults",
+    "Couples",
+    "Parents",
+    "Ministers",
+    "Love Relationship",
+    "Family",
+    "Old classics"
+  ];
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const statusEl = document.getElementById('status');
+  const warningsEl = document.getElementById('warnings');
+  const outputSection = document.getElementById('outputSection');
+  const outputEl = document.getElementById('output');
+  const countPill = document.getElementById('countPill');
+  const copyBtn = document.getElementById('copyBtn');
+
+  dropzone.addEventListener('click', () => {
+    if (libraryReady) fileInput.click();
+  });
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-over');
+    if (!libraryReady) return;
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length) handleFile(e.target.files[0]);
+  });
+
+  copyBtn.addEventListener('click', () => {
+    outputEl.select();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(outputEl.value).then(() => {
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = 'Copy'), 1500);
+      }).catch(() => {
+        copyBtn.textContent = 'Select all shown \u2014 press Ctrl/Cmd+C';
+        setTimeout(() => (copyBtn.textContent = 'Copy'), 2500);
+      });
+    } else {
+      // Clipboard API unavailable (e.g. opening the file directly without https) —
+      // the text is already selected above, so a manual copy still works.
+      copyBtn.textContent = 'Selected \u2014 press Ctrl/Cmd+C';
+      setTimeout(() => (copyBtn.textContent = 'Copy'), 2500);
+    }
+  });
+
+  function handleFile(file) {
+    if (typeof XLSX === 'undefined') {
+      statusEl.textContent = 'The spreadsheet library isn\'t loaded yet. Please wait a moment, or reload the page.';
+      statusEl.className = 'status error';
+      return;
+    }
+
+    statusEl.textContent = 'Reading ' + file.name + '…';
+    statusEl.className = 'status';
+    warningsEl.className = 'warnings';
+    outputSection.classList.remove('show');
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        processRows(rows);
+      } catch (err) {
+        statusEl.textContent = 'Could not read that file: ' + err.message;
+        statusEl.className = 'status error';
+      }
+    };
+    reader.onerror = () => {
+      statusEl.textContent = 'Could not read that file — it may be corrupted or in an unsupported format.';
+      statusEl.className = 'status error';
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function normalizeHeader(h) {
+    return String(h || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  function findColumn(headerRow, aliases) {
+    for (let i = 0; i < headerRow.length; i++) {
+      const norm = normalizeHeader(headerRow[i]);
+      if (aliases.includes(norm)) return i;
+    }
+    return -1;
+  }
+
+  function processRows(rows) {
+    if (!rows.length) {
+      statusEl.textContent = 'That file looks empty.';
+      statusEl.className = 'status error';
+      return;
+    }
+
+    const headerRow = rows[0];
+    const col = {
+      title: findColumn(headerRow, ['title']),
+      topic: findColumn(headerRow, ['topic']),
+      link: findColumn(headerRow, ['youtube link', 'youtube url', 'link', 'url']),
+      duration: findColumn(headerRow, ['duration']),
+    };
+
+    if (col.title === -1 || col.topic === -1 || col.link === -1) {
+      statusEl.textContent = 'Could not find Title, Topic, and YouTube Link columns. Make sure your header row matches the template.';
+      statusEl.className = 'status error';
+      return;
+    }
+
+    const movies = [];
+    const warnings = [];
+
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      const title = String(row[col.title] || '').trim();
+      const topicRaw = String(row[col.topic] || '').trim();
+      const link = String(row[col.link] || '').trim();
+      const duration = col.duration !== -1 ? String(row[col.duration] || '').trim() : '';
+
+      // Skip rows that don't look like a real movie entry (e.g. blank rows, instruction rows)
+      if (!title || !topicRaw || !link) continue;
+
+      const topics = topicRaw.split(',').map(t => t.trim()).filter(Boolean);
+
+      if (!duration) {
+        warnings.push(`Row ${r + 1} ("${title}"): no duration given — will show blank.`);
+      }
+      topics.forEach((topic) => {
+        if (!KNOWN_TOPICS.includes(topic)) {
+          warnings.push(`Row ${r + 1} ("${title}"): topic "${topic}" doesn't match any existing shelf — it'll be in the code, but won't appear on the site until you add a matching shelf.`);
+        }
+      });
+      if (!/youtube\.com\/watch\?v=|youtu\.be\//.test(link)) {
+        warnings.push(`Row ${r + 1} ("${title}"): "${link}" doesn't look like a standard YouTube link — double check it.`);
+      }
+
+      movies.push({ title, topics, link, duration });
+    }
+
+    if (!movies.length) {
+      statusEl.textContent = 'No movie rows found. Check that your data starts on row 2.';
+      statusEl.className = 'status error';
+      return;
+    }
+
+    renderOutput(movies);
+
+    statusEl.textContent = `Converted ${movies.length} movie${movies.length === 1 ? '' : 's'}.`;
+    statusEl.className = 'status ok';
+
+    if (warnings.length) {
+      warningsEl.innerHTML = '<strong>Heads up:</strong><ul>' + warnings.map(w => `<li>${escapeHtml(w)}</li>`).join('') + '</ul>';
+      warningsEl.classList.add('show');
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function jsStringLiteral(str) {
+    return '"' + String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+  }
+
+  function renderOutput(movies) {
+    const grouped = {};
+    const order = [];
+    movies.forEach((m) => {
+      m.topics.forEach((topic) => {
+        if (!grouped[topic]) {
+          grouped[topic] = [];
+          order.push(topic);
+        }
+        grouped[topic].push(m);
+      });
+    });
+
+    const seen = new Set();
+    let out = 'const MOVIES = [\n';
+    order.forEach((topic) => {
+      out += `  // ----- ${topic} -----\n`;
+      grouped[topic].forEach((m) => {
+        const key = m.title + '|' + m.link;
+        if (seen.has(key)) {
+          out += `  // (already listed above — appears on multiple shelves via its topics array)\n`;
+          return;
+        }
+        seen.add(key);
+        const topicsArray = '[' + m.topics.map(jsStringLiteral).join(', ') + ']';
+        out += `  { title: ${jsStringLiteral(m.title)}, topics: ${topicsArray}, youtubeUrl: ${jsStringLiteral(m.link)}, duration: ${jsStringLiteral(m.duration)} },\n`;
+      });
+      out += '\n';
+    });
+    out = out.replace(/\n\n$/, '\n');
+    out += '];';
+
+    outputEl.value = out;
+    outputSection.classList.add('show');
+    countPill.textContent = `${movies.length} movies across ${order.length} topic${order.length === 1 ? '' : 's'}`;
+  }
+</script>
+</body>
+</html>
