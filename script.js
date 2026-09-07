@@ -1160,15 +1160,20 @@ const MOVIES = [
   // (already listed above — appears on multiple shelves via its topics array)
 
   // ----- New Releases -----
-  { title: "Abattoir (S6 Ep11)", topics: ["New Releases"], youtubeUrl: "https://youtu.be/xtSvIWemLEg?si=vvm2NCCGVYaWjdr-", duration: "1h 6m" },
-  { title: "Abattoir (S6 Ep12)", topics: ["New Releases"], youtubeUrl: "https://youtu.be/WtOmSqVvuUs?si=J-IeQxj0GW_O0_oH", duration: "59m" },
-  { title: "The Baby Christian", topics: ["New Releases"], youtubeUrl: "https://youtu.be/ZNebZZGjCO4?si=0G5IExi7YsOKSBYA", duration: "1h 30m" },
+  { title: "Manasseh (The Movie)", topics: ["New Releases"], youtubeUrl: "https://youtu.be/d639zLPZ1Io?si=Pzx2mxcB2q3l4H_w", duration: "2h 19m" },
+  { title: "The Unhealed Prophet", topics: ["New Releases"], youtubeUrl: "https://youtu.be/A2CubclB_Po?si=FV9lcnBf4M6m1GkP", duration: "1h 27m" },
+  { title: "Homecoming (Ep2)", topics: ["New Releases"], youtubeUrl: "https://youtu.be/r0TqO-w2A4c?si=vL8PqaV8UB6IdAfn", duration: "42m" },
+  { title: "When Past Knocks", topics: ["New Releases"], youtubeUrl: "https://youtu.be/NrirQtwLUio?si=E7SYylzU1RxwpI3g", duration: "57m" },
+  { title: "The Casualty", topics: ["New Releases"], youtubeUrl: "https://youtu.be/2t5qegv3Q5M?si=rXkKyhKqrVJiLlbn", duration: "2h 7m" },
+  { title: "Reel or Real", topics: ["New Releases"], youtubeUrl: "https://youtu.be/bm8Kw1sCbwQ?si=tiUMl6mR7KpVxYPJ", duration: "22m" },
+  { title: "Abattoir  (S6 Ep13)", topics: ["New Releases"], youtubeUrl: "https://youtu.be/9BmWYnUQTKo?si=GQQCeVQQQr5yCJRM", duration: "1h 4m" },
   { title: "The Last Witness", topics: ["New Releases"], youtubeUrl: "https://youtu.be/pnVk5UFjBrs?si=n4yOU37F3_rbeYjE", duration: "1h 15m" },
   { title: "Home Coming Ep1", topics: ["New Releases"], youtubeUrl: "https://youtu.be/PiejHMwOfEM?si=tP4J19yPkphoQRBg", duration: "33m" },
   { title: "Behind Her", topics: ["New Releases"], youtubeUrl: "https://youtu.be/C4UnPAhSyUs?si=yFtONKqkxp2z85B-", duration: "1h 35m" },
   { title: "When Love fails", topics: ["New Releases"], youtubeUrl: "https://youtu.be/ANEpEqXHzNs?si=m5MTcQgB-D4Pry4Z", duration: "2h 6m" },
   { title: "God in the room", topics: ["New Releases"], youtubeUrl: "https://youtu.be/M2mJQH-luxw?si=wR_qhF2bgILDS3Ty", duration: "1h 22m" },
   { title: "Hamtoria", topics: ["New Releases"], youtubeUrl: "https://youtu.be/JOsrX_FY_8M?si=sfkZ_QZbUEX0atHq", duration: "1h 17m" },
+  { title: "The Baby Christian", topics: ["New Releases"], youtubeUrl: "https://youtu.be/ZNebZZGjCO4?si=0G5IExi7YsOKSBYA", duration: "1h 30m" },
 
   // ----- Newly found -----
   { title: "The Voice I rejected", topics: ["Newly found"], youtubeUrl: "https://youtu.be/8BTixsGW54c?si=W1DdxaTvFOze43bb", duration: "1h 4m" },
